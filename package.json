@@ -8,7 +8,7 @@
     "clean": "rimraf ./dist",
     "build": "npm run clean && tsc",
     "lint": "npx eslint ./cli",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test": "jest --coverage",
     "prepare": "husky"
   },
   "bin": {
