@@ -1,5 +1,4 @@
-import { exec } from 'child_process'
-import { promisify } from 'util'
+import { execSync } from 'child_process'
 
 type PackageManager = 'npm' | 'yarn'
 
@@ -15,13 +14,12 @@ class PackageInstaller {
   /**
    * Install the given packages.
    */
-  async installPackages (): Promise<void> {
+  installPackages (): void {
     const command = this.getInstallCommand()
 
     try {
       console.log('Installing packages...')
-      const execAsync = promisify(exec)
-      await execAsync(command, { cwd: this.PROJECT_DIR })
+      execSync(command, { cwd: this.PROJECT_DIR, stdio: 'ignore' });
       console.log('Packages installed successfully.')
     } catch (error) {
       console.error('Error installing packages:', error)
@@ -31,9 +29,9 @@ class PackageInstaller {
   private getInstallCommand (): string {
     switch (this.PACKAGE_MANAGER) {
       case 'npm':
-        return 'npm install'
+        return 'npm install --silent'
       case 'yarn':
-        return 'yarn install'
+        return 'yarn install --silent'
       default:
         throw new Error('Unsupported package manager')
     }

@@ -8,16 +8,18 @@ import PackageInstaller from '../services/packageInstaller.service'
  * @param projectName The name of the project to create.
  * @param options The command options containing the app ID.
  */
-export async function newProject (projectName: string, options: { appId: string, skipInstall?: boolean }): Promise<void> {
+export async function newProject (projectName: string, options: { appId: string, secretKey: string, skipInstall?: boolean }): Promise<void> {
   const appId = options.appId.trim()
+  const secretKey = options.secretKey.trim()
   const projectDir = path.join(process.cwd(), projectName)
 
   try {
     // Create project files
     const fileCreator = new FileCreator(appId, projectDir)
-    await fileCreator.createProject({
+    fileCreator.createProject({
       projectName,
-      appId
+      appId,
+      secretKey,
     })
 
     if (options.skipInstall) {
@@ -26,7 +28,7 @@ export async function newProject (projectName: string, options: { appId: string,
     } else {
       // Install packages
       const packageInstaller = new PackageInstaller('npm', projectDir)
-      await packageInstaller.installPackages()
+      packageInstaller.installPackages()
     }
 
     // Show success message
@@ -34,7 +36,7 @@ export async function newProject (projectName: string, options: { appId: string,
     console.log(`🚀 Project ${chalk.green(projectName)} created!`)
     console.log('👉 Start the project with these commands:\n')
     console.log(chalk.grey(`   cd ${projectName}`))
-    console.log(chalk.grey('   npm start:dev'))
+    console.log(chalk.grey('   npm start'))
     console.log('\n')
   } catch (error) {
     console.error(chalk.red('Error creating project:', error))
