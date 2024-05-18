@@ -4,14 +4,15 @@ import fetch from 'sync-fetch';
  * Service for calling the Kottster API.
  */
 export class API {
+  static readonly BASE_API_URL = 'https://api.kottster.app';
+
   /**
    * Get the JWT secret
    * @param appId The app ID
    * @param secretKey The API secret key
    */
   static getJWTSecret(appId: string, secretKey: string): string {
-    // const url = `https://api.kottster.app/apps/${this.appId}/jwt-secret?secretKey=${encodeURIComponent(secretKey)}`;
-    const url = `http://localhost:7800/apps/${appId}/jwt-secret?secretKey=${encodeURIComponent(secretKey)}`;
+    const url = `${this.BASE_API_URL}/apps/${appId}/jwt-secret?secretKey=${encodeURIComponent(secretKey)}`;
 
     try {
       const res = fetch(url);
