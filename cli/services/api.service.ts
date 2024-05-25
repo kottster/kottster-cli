@@ -4,7 +4,7 @@ import fetch from 'sync-fetch';
  * Service for calling the Kottster API.
  */
 export class API {
-  static readonly BASE_API_URL = 'https://api.kottster.app';
+  static readonly API_BASE_URL = process.env.KOTTSTER_API_BASE_URL ?? 'https://api.kottster.app';
 
   /**
    * Get the JWT secret
@@ -12,7 +12,7 @@ export class API {
    * @param secretKey The API secret key
    */
   static getJWTSecret(appId: string, secretKey: string): string {
-    const url = `${this.BASE_API_URL}/apps/${appId}/jwt-secret?secretKey=${encodeURIComponent(secretKey)}`;
+    const url = `${this.API_BASE_URL}/apps/${appId}/jwt-secret?secretKey=${encodeURIComponent(secretKey)}`;
 
     try {
       const res = fetch(url);

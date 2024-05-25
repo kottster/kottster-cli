@@ -95,8 +95,8 @@ export class FileCreator {
         start: 'kottster start src/main.js'
       },
       dependencies: (options.dependencies != null) || {
-        '@kottster/cli': 'file:../@kottster-cli',
-        '@kottster/backend': 'file:../@kottster-backend',
+        '@kottster/cli': process.env.KOTTSTER_CLI_DEP_VER ?? '^1.0.0',
+        '@kottster/backend': process.env.KOTTSTER_BACKEND_DEP_VER ?? '^1.0.0',
         'dotenv': '^1',
       },
       devDependencies: (options.devDependencies != null) || {}
