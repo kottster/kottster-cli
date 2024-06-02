@@ -36,7 +36,7 @@ export class FileCreator {
 
   public createProject (options: CreateProjectOptions): void {
     // Check if project directory already exists
-    if (fs.existsSync(this.PROJECT_DIR)) {
+    if (fs.existsSync(this.PROJECT_DIR) && options.projectName !== '.') {
       throw new Error(`Project directory already exists: ${this.PROJECT_DIR}`)
     };
 
@@ -63,6 +63,7 @@ export class FileCreator {
       },
     ])
     this.createGitIgnore()
+    this.createDockerfile()
     this.createDir('src')
     this.createMainJs()
     this.createAppJs()
@@ -92,12 +93,15 @@ export class FileCreator {
       author: options.author || '',
       license: options.license || 'MIT',
       scripts: {
-        start: 'kottster start src/main.js'
+        start: 'kottster start src/main.js',
+        postinstall: 'npm install @kottster/cli@^1.0.0 -g'
+      },
+      engines: {
+        node: '>=16.0.0'
       },
       dependencies: (options.dependencies != null) || {
         '@kottster/cli': process.env.KOTTSTER_CLI_DEP_VER ?? '^1.0.0',
         '@kottster/backend': process.env.KOTTSTER_BACKEND_DEP_VER ?? '^1.0.0',
-        'dotenv': '^1',
       },
       devDependencies: (options.devDependencies != null) || {}
     }
@@ -129,6 +133,16 @@ export class FileCreator {
   }
 
   /**
+   * Create a Dockerfile
+   */
+  private createDockerfile (): void {
+    const dockerfilePath = path.join(this.PROJECT_DIR, 'Dockerfile')
+    const dockerfileContent = `FROM node:18\n\nWORKDIR /usr/src/app\n\nCOPY package*.json ./\n\nRUN npm install\n\nCOPY . .\n\nRUN npm install @kottster/cli@^1.0.0 -g\n\nEXPOSE 5480\n\nCMD ["npm", "start"]\n\n`
+
+    this.writeFile(dockerfilePath, dockerfileContent)
+  }
+
+  /**
    * Create a src/app.js file
    * @description This file creates the Kottster app for the specified stage
    */
@@ -138,11 +152,7 @@ export class FileCreator {
     let appJsContent = ''
 
     // Add imports
-    appJsContent += 'import dotenv from \'dotenv\';\n'
     appJsContent += 'import { createApp, getEnvOrThrow } from \'@kottster/backend\';\n\n'
-
-    // Load env vars from .env file
-    appJsContent += `dotenv.config({ path: '.env' });\n\n`
 
     // Create app and export it
     appJsContent += `export const app = createApp({\n  appId: getEnvOrThrow('APP_ID'),\n  secretKey: getEnvOrThrow('SECRET_KEY')\n});\n\n`
@@ -170,15 +180,16 @@ export class FileCreator {
     let mainJsContent = '';
 
     // Add imports
-    mainJsContent += 'import \'./__generated__\';\n'
-    mainJsContent += 'import { app } from \'./app\';\n'
-    mainJsContent += 'import adapters from \'./adapters\';\n\n'
+    mainJsContent += 'import \'./__generated__/index.js\';\n'
+    mainJsContent += 'import { app } from \'./app.js\';\n'
+    mainJsContent += 'import adapters from \'./adapters.js\';\n'
+    mainJsContent += 'import { createApp, getEnvOrThrow } from \'@kottster/backend\';\n\n'
 
     // Set adapters for the app
     mainJsContent += 'app.setAdapters(adapters);\n\n'
 
     // Create express server and run it
-    mainJsContent += 'app.start(5480);\n\n'
+    mainJsContent += `app.start(getEnvOrThrow('PORT') ?? 5480);\n\n`
 
     this.writeFile(mainJsPath, mainJsContent)
   }

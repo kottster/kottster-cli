@@ -11,8 +11,8 @@ import PackageInstaller from '../services/packageInstaller.service'
 export async function newProject (projectName: string, options: { appId: string, secretKey: string, skipInstall?: boolean }): Promise<void> {
   const appId = options.appId.trim()
   const secretKey = options.secretKey.trim()
-  const projectDir = path.join(process.cwd(), projectName)
-
+  const projectDir = projectName === '.' ? process.cwd() : path.join(process.cwd(), projectName);
+  
   try {
     // Create project files
     const fileCreator = new FileCreator(appId, projectDir)
