@@ -29,9 +29,9 @@ class PackageInstaller {
   private getInstallCommand (): string {
     switch (this.PACKAGE_MANAGER) {
       case 'npm':
-        return 'npm install --silent'
+        return 'npm install'
       case 'yarn':
-        return 'yarn install --silent'
+        return 'yarn install'
       default:
         throw new Error('Unsupported package manager')
     }
