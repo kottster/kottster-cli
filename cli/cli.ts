@@ -20,5 +20,5 @@ program
   .description('Create a new project')
   .requiredOption('-id, --appId <appId>', 'The ID of the app')
   .requiredOption('-sk, --secretKey <secretKey>', 'The secret key of the app')
-  .option('--skip-install', 'Skip package installation')
+  .option('--skipInstall', 'Skip installing dependencies')
   .action(newProject)

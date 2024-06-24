@@ -67,7 +67,7 @@ export class FileCreator {
     this.createDir('src')
     this.createMainJs()
     this.createAppJs()
-    this.createAdaptersJs()
+    this.createAdapterJs()
 
     // Create files for each stage
     Object.values(Stage).forEach((stage) => {
@@ -161,12 +161,12 @@ export class FileCreator {
   }
 
   /**
-   * Create a src/adapters.js file
-   * @description This file is used to create adapters for the app
+   * Create a src/adapter.js file
+   * @description This file is used to create an adapter for the app
    */
-  public createAdaptersJs (): void {
-    const adapterJsPath = path.join(this.PROJECT_DIR, 'src', 'adapters.js')
-    const adapterJsContent = 'export default {};\n\n'
+  public createAdapterJs (): void {
+    const adapterJsPath = path.join(this.PROJECT_DIR, 'src', 'adapter.js')
+    const adapterJsContent = 'export const adapter = null;\n\n'
 
     this.writeFile(adapterJsPath, adapterJsContent)
   }
@@ -182,11 +182,11 @@ export class FileCreator {
     // Add imports
     mainJsContent += 'import \'./__generated__/index.js\';\n'
     mainJsContent += 'import { app } from \'./app.js\';\n'
-    mainJsContent += 'import adapters from \'./adapters.js\';\n'
-    mainJsContent += 'import { createApp, getEnvOrThrow } from \'@kottster/backend\';\n\n'
+    mainJsContent += 'import { adapter } from \'./adapter.js\';\n'
+    mainJsContent += 'import { getEnvOrThrow } from \'@kottster/backend\';\n\n'
 
     // Set adapters for the app
-    mainJsContent += 'app.setAdapters(adapters);\n\n'
+    mainJsContent += 'app.setAdapter(adapter);\n\n'
 
     // Create express server and run it
     mainJsContent += `app.start(getEnvOrThrow('PORT') ?? 5480);\n\n`
