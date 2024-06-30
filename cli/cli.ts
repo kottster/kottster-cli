@@ -20,5 +20,6 @@ program
   .description('Create a new project')
   .requiredOption('-id, --appId <appId>', 'The ID of the app')
   .requiredOption('-sk, --secretKey <secretKey>', 'The secret key of the app')
+  .requiredOption('-db, --database <database>', 'The database type to connect to')
   .option('--skipInstall', 'Skip installing dependencies')
   .action(newProject)

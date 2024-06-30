@@ -3,16 +3,24 @@ import chalk from 'chalk'
 import { FileCreator } from '../services/fileCreator.service'
 import PackageInstaller from '../services/packageInstaller.service'
 
+interface Options { 
+  appId: string;
+  secretKey: string;
+  database: string;
+  skipInstall?: boolean;
+}
+
 /**
  * Create a new project with the given name.
  * @param projectName The name of the project to create.
  * @param options The command options containing the app ID.
  */
-export async function newProject (projectName: string, options: { appId: string, secretKey: string, skipInstall?: boolean }): Promise<void> {
-  const appId = options.appId.trim()
-  const secretKey = options.secretKey.trim()
+export async function newProject (projectName: string, options: Options): Promise<void> {
+  const appId = options.appId?.trim()
+  const secretKey = options.secretKey?.trim()
+  const database = options.database?.trim()
   const projectDir = projectName === '.' ? process.cwd() : path.join(process.cwd(), projectName);
-  
+
   try {
     // Create project files
     const fileCreator = new FileCreator(appId, projectDir)
@@ -20,6 +28,7 @@ export async function newProject (projectName: string, options: { appId: string,
       projectName,
       appId,
       secretKey,
+      database,
     })
 
     if (options.skipInstall) {

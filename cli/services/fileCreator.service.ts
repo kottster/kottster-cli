@@ -7,6 +7,7 @@ interface CreateProjectOptions {
   projectName: string
   appId: string
   secretKey: string
+  database: string
 }
 
 interface PackageJsonOptions {
@@ -43,8 +44,13 @@ export class FileCreator {
     // Create project directory
     this.createDir()
 
+    const dependencies = this.getDatabaseDependencies(options.database)
+
     // Create root files
-    this.createPackageJson({ name: options.projectName })
+    this.createPackageJson({ 
+      name: options.projectName,
+      dependencies
+    })
     this.createEnv([
       {
         key: 'APP_ID',
@@ -79,6 +85,24 @@ export class FileCreator {
     })
   }
 
+  private getDatabaseDependencies (database: string): Record<string, string> {
+    if (!database) {
+      throw new Error('Database is required. Use -db flag to specify the database to connect to')
+    }
+    
+    switch (database) {
+      case 'mysql':
+      case 'mariadb':
+        return { 'mysql2': '^3.9.7' }
+      case 'postgres':
+        return { 'pg': '^8.11.5' }
+      case 'mssql':
+        return { 'tedious': '^18.2.0' }
+      default:
+        throw new Error(`Unsupported database: ${database}`)
+    }
+  }
+
   /**
    * Create a package.json file
    */
@@ -99,9 +123,10 @@ export class FileCreator {
       engines: {
         node: '>=16.0.0'
       },
-      dependencies: (options.dependencies != null) || {
+      dependencies: {
         '@kottster/cli': process.env.KOTTSTER_CLI_DEP_VER ?? '^1.0.0',
         '@kottster/backend': process.env.KOTTSTER_BACKEND_DEP_VER ?? '^1.0.0',
+        ...(options.dependencies ?? {}),
       },
       devDependencies: (options.devDependencies != null) || {}
     }
